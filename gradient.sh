@@ -61,7 +61,6 @@ case $choice in
         echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
 
         # 프록시 정보를 직접 proxy.txt 파일에 저장
-        > "$WORK/proxy.txt"  # 파일 초기화
         while IFS= read -r line; do
             [[ -z "$line" ]] && break
             # http 형식을 socks5 형식으로 변환

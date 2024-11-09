@@ -32,7 +32,7 @@ case $choice in
             rm -rf "$WORK"
         fi
 
-        git clone https://github.com/airdropinsiders/HumanityTestnet-Bot.git
+        git clone https://github.com/web3bothub/gradient-bot
         cd "$WORK"
 
         # Docker GPG 키 추가

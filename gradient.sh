@@ -14,7 +14,8 @@ export WORK="/root/gradient-bot"
 echo -e "${GREEN}스크립트작성자: https://t.me/kjkresearch${NC}"
 echo -e "${BOLD}${CYAN}1. gradient 노드 설치${NC}"
 echo -e "${BOLD}${CYAN}2. gradient 노드 업데이트${NC}"
-read -p "원하는 작업을 선택하세요 (1/2): " choice
+echo -e "${BOLD}${CYAN}3. gradient 노드 제거${NC}"
+read -p "원하는 작업을 선택하세요 (1/2/3): " choice
 
 case $choice in
     1)
@@ -32,7 +33,7 @@ case $choice in
             rm -rf "$WORK"
         fi
 
-        git clone https://github.com/web3bothub/gradient-bot
+        git clone https://github.com/airdropinsiders/HumanityTestnet-Bot.git
         cd "$WORK"
 
         # Docker GPG 키 추가
@@ -61,6 +62,7 @@ case $choice in
         echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
 
         # 프록시 정보를 직접 proxy.txt 파일에 저장
+        > "$WORK/proxy.txt"  # 파일 초기화
         while IFS= read -r line; do
             [[ -z "$line" ]] && break
             # http 형식을 socks5 형식으로 변환
@@ -71,6 +73,8 @@ case $choice in
         echo -e "${GREEN}프록시 정보가 proxy.txt 파일에 저장되었습니다.${NC}"
 
         # 사용자에게 이메일과 비밀번호 입력 받기
+        echo -e "${YELLOW}소셜계정으로 가입하신 경우 대시보드에서 forgot password를 클릭한 후 패스워드를 생성하셔야합니다.${NC}"
+        echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
         read -p "이메일을 입력하세요: " APP_USER
         read -p "비밀번호를 입력하세요: " APP_PASS
         echo
@@ -81,6 +85,11 @@ case $choice in
         -e APP_PASS="$APP_PASS" \
         -v ./proxies.txt:/app/proxies.txt \
         overtrue/gradient-bot
+
+        echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
+        docker ps | grep gradient
+        read -p "gradient 컨테이너 ID를 입력하세요. 맨앞에있는 알파뱃과 숫자의 혼합입니다.: " container_id1
+        echo -e "${YELLOW}로그를 보시려면 다음 명령어를 입력하세요: docker logs $container_id1${NC}"
         ;;
     2)
         echo -e "${YELLOW}gradient 노드를 업데이트합니다.${NC}"
@@ -108,7 +117,20 @@ case $choice in
         overtrue/gradient-bot
         ;;
 
-        *)
-        echo -e "${RED}잘못된 선택입니다. 1, 2, 3, 4 중 하나를 선택하세요.${NC}"
+    3)
+        echo -e "${YELLOW}gradient 노드를 제거합니다.${NC}"
+        cd "$WORK"
+
+        # gradient 컨테이너 제거
+        echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
+        docker ps | grep gradient  # gradient 관련 컨테이너 목록 출력
+        read -p "제거할 gradient 컨테이너 ID를 입력하세요: " container_id2
+        docker rm -f "$container_id2"  # 컨테이너 강제 제거
+        echo -e "${GREEN}컨테이너 $container_id2 가 제거되었습니다.${NC}"
+        echo
+        ;;
+
+    *)
+        echo -e "${RED}잘못된 선택입니다. 1, 2, 3 중 하나를 선택하세요.${NC}"
         ;;
 esac

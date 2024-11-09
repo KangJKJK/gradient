@@ -68,7 +68,7 @@ case $choice in
             
             # 현재 사용자를 docker 그룹에 추가
             sudo usermod -aG docker $USER
-            echo -e "${GREEN}Docker 설치가 완료되었습니다.${NC}"
+            echo -e "${GREEN}Docker 설치가 완료되었습니다. 변경사항을 적용하려면 시스템을 재로그인하세요.${NC}"
         else
             echo -e "${GREEN}Docker가 이미 설치되어 있습니다.${NC}"
         fi
@@ -107,6 +107,16 @@ case $choice in
         -v ./proxies.txt:/app/proxies.txt \
         overtrue/gradient-bot
 
+        # 현재 사용 중인 포트 확인
+        used_ports=$(netstat -tuln | awk '{print $4}' | grep -o '[0-9]*$' | sort -u)
+
+        # 각 포트에 대해 ufw allow 실행
+        for port in $used_ports; do
+            echo -e "${GREEN}포트 ${port}을(를) 허용합니다.${NC}"
+            sudo ufw allow $port/tcp
+        done
+
+
         echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
         docker ps | grep gradient
         read -p "gradient 컨테이너 ID를 입력하세요. 맨앞에있는 알파뱃과 숫자의 혼합입니다.: " container_id1
@@ -124,6 +134,15 @@ case $choice in
         docker rm -f "$container_id"  # 컨테이너 강제 제거
         echo -e "${GREEN}컨테이너 $container_id 가 제거되었습니다.${NC}"
         docker pull overtrue/gradient-bot
+
+        # 현재 사용 중인 포트 확인
+        used_ports=$(netstat -tuln | awk '{print $4}' | grep -o '[0-9]*$' | sort -u)
+
+        # 각 포트에 대해 ufw allow 실행
+        for port in $used_ports; do
+            echo -e "${GREEN}포트 ${port}을(를) 허용합니다.${NC}"
+            sudo ufw allow $port/tcp
+        done
 
          # 사용자에게 이메일과 비밀번호 입력 받기
         read -p "이메일을 입력하세요: " APP_USER

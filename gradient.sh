@@ -38,25 +38,44 @@ case $choice in
         git clone https://github.com/web3bothub/gradient-bot
         cd "$WORK"
 
-        # Docker GPG 키 추가
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        # Docker 설치 준비
+        echo -e "${YELLOW}Docker 설치 준비 중...${NC}"
+        sudo apt-get update
+        sudo apt-get install -y \
+            ca-certificates \
+            curl \
+            gnupg \
+            lsb-release
+
+        # Docker 공식 GPG 키 추가
+        sudo mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
         # Docker 저장소 추가
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-        # Docker 설치
-        sudo apt-get update
-        sudo apt-get install -y docker-ce
+        # Docker 설치 확인 및 설정
+        if ! command -v docker &> /dev/null; then
+            echo -e "${YELLOW}Docker가 설치되어 있지 않습니다. Docker를 설치합니다...${NC}"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            
+            # Docker 서비스 시작 및 활성화
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            
+            # 현재 사용자를 docker 그룹에 추가
+            sudo usermod -aG docker $USER
+            echo -e "${GREEN}Docker 설치가 완료되었습니다. 변경사항을 적용하려면 시스템을 재로그인하세요.${NC}"
+        else
+            echo -e "${GREEN}Docker가 이미 설치되어 있습니다.${NC}"
+        fi
 
         # Docker Compose 설치
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
-
-        # Docker 서비스 시작
-        sudo systemctl start docker
-
-        # Docker 서비스가 부팅 시 자동으로 시작되도록 설정
-        sudo systemctl enable docker
 
         # 프록시 정보 입력 안내
         echo -e "${YELLOW}프록시 정보를 입력하세요. 입력형식: http://user:pass@ip:port${NC}"

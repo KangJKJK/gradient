@@ -108,3 +108,8 @@ case $choice in
         -v ./proxies.txt:/app/proxies.txt \
         overtrue/gradient-bot
         ;;
+
+        *)
+        echo -e "${RED}잘못된 선택입니다. 1, 2, 3, 4 중 하나를 선택하세요.${NC}"
+        ;;
+esac

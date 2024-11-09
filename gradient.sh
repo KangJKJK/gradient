@@ -68,7 +68,7 @@ case $choice in
             
             # 현재 사용자를 docker 그룹에 추가
             sudo usermod -aG docker $USER
-            echo -e "${GREEN}Docker 설치가 완료되었습니다. 변경사항을 적용하려면 시스템을 재로그인하세요.${NC}"
+            echo -e "${GREEN}Docker 설치가 완료되었습니다.${NC}"
         else
             echo -e "${GREEN}Docker가 이미 설치되어 있습니다.${NC}"
         fi

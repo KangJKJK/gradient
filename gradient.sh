@@ -25,6 +25,8 @@ case $choice in
         echo -e "${BOLD}${CYAN}필수 패키지 설치 중...${NC}"
         sudo apt-get update
         sudo apt-get -y upgrade
+        sudo apt update
+        sudo apt install git
         sudo apt-get install -y ufw
 
         echo -e "${YELLOW}작업 공간 준비 중...${NC}"

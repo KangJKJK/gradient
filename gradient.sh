@@ -120,7 +120,7 @@ case $choice in
         echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
         docker ps | grep gradient
         read -p "gradient 컨테이너 ID를 입력하세요. 맨앞에있는 알파뱃과 숫자의 혼합입니다.: " container_id1
-        echo -e "${YELLOW}로그를 보시려면 다음 명령어를 입력하세요: docker logs $container_id1${NC}"
+        echo -e "${YELLOW}로그를 보시려면 다음 명령어를 입력하세요: docker logs -f $container_id1${NC}"
         ;;
     2)
         echo -e "${YELLOW}gradient 노드를 업데이트합니다.${NC}"

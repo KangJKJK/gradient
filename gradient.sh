@@ -77,6 +77,9 @@ case $choice in
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
 
+        #docker 이미지 최신화
+        docker pull overtrue/gradient-bot
+
         # 프록시 정보 입력 안내
         echo -e "${YELLOW}프록시 정보를 입력하세요.${NC}"
         echo -e "${YELLOW}입력형식: socks5://user:pass@ip:port${NC}"
@@ -101,13 +104,6 @@ case $choice in
 
         echo -e "${GREEN}프록시 정보가 proxies.txt 파일에 저장되었습니다.${NC}"
 
-        # 사용자에게 이메일과 비밀번호 입력 받기
-        echo -e "${YELLOW}소셜계정으로 가입하신 경우 대시보드에서 forgot password를 클릭한 후 패스워드를 생성하셔야합니다.${NC}"
-        echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
-        read -p "이메일을 입력하세요: " APP_USER
-        read -p "비밀번호를 입력하세요: " APP_PASS
-        echo
-
         # Docker 명령어 실행
         docker run -d \
         -e APP_USER="$APP_USER" \
@@ -115,15 +111,24 @@ case $choice in
         -v ./proxies.txt:/app/proxies.txt \
         overtrue/gradient-bot
 
-        # 현재 사용 중인 포트 확인
-        used_ports=$(netstat -tuln | awk '{print $4}' | grep -o '[0-9]*$' | sort -u)
-
-        # 각 포트에 대해 ufw allow 실행
-        for port in $used_ports; do
-            echo -e "${GREEN}포트 ${port}을(를) 허용합니다.${NC}"
-            sudo ufw allow $port/tcp
+        # 모든 사용 중인 포트 확인 (TCP와 UDP 모두)
+        echo -e "${YELLOW}현재 사용 중인 모든 포트를 확인하고 방화벽 규칙을 추가합니다...${NC}"
+        
+        # TCP 포트 확인 및 허용
+        tcp_ports=$(netstat -tln | grep LISTEN | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+        for port in $tcp_ports; do
+        echo -e "${GREEN}TCP 포트 ${port}을(를) 허용합니다.${NC}"
+        sudo ufw allow $port/tcp
         done
-
+        
+        # UDP 포트 확인 및 허용
+        udp_ports=$(netstat -uln | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+        for port in $udp_ports; do
+        echo -e "${GREEN}UDP 포트 ${port}을(를) 허용합니다.${NC}"
+        sudo ufw allow $port/udp
+        done
+        
+        echo -e "${GREEN}모든 사용 중인 포트에 대한 방화벽 규칙이 추가되었습니다.${NC}"
 
         echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
         docker ps | grep gradient

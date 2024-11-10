@@ -82,16 +82,34 @@ case $choice in
         echo -e "${YELLOW}여러 개의 프록시는 줄바꿈으로 구분하세요.${NC}"
         echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
 
-        # 프록시 정보를 직접 proxy.txt 파일에 저장
-        > "$WORK/proxy.txt"  # 파일 초기화
+        # 프록시 타입 선택
+        read -p "프록시 타입을 선택하세요 (1: HTTP, 2: SOCKS5): " proxy_type
+
+        # proxies.txt 파일 초기화
+        > "$WORK/proxies.txt"
+
+        # 프록시 정보 입력 받기
         while IFS= read -r line; do
             [[ -z "$line" ]] && break
-            # http 형식을 socks5 형식으로 변환
-            socks5_line="${line/http:/socks5:}"
-            echo "$socks5_line" >> "$WORK/proxies.txt"
+            
+            case $proxy_type in
+                1)
+                    # HTTP를 SOCKS5로 변환
+                    socks5_line="${line/http:/socks5:}"
+                    echo "$socks5_line" >> "$WORK/proxies.txt"
+                    ;;
+                2)
+                    # SOCKS5는 그대로 저장
+                    echo "$line" >> "$WORK/proxies.txt"
+                    ;;
+                *)
+                    echo -e "${RED}잘못된 선택입니다. 프로그램을 종료합니다.${NC}"
+                    exit 1
+                    ;;
+            esac
         done
 
-        echo -e "${GREEN}프록시 정보가 proxy.txt 파일에 저장되었습니다.${NC}"
+        echo -e "${GREEN}프록시 정보가 proxies.txt 파일에 저장되었습니다.${NC}"
 
         # 사용자에게 이메일과 비밀번호 입력 받기
         echo -e "${YELLOW}소셜계정으로 가입하신 경우 대시보드에서 forgot password를 클릭한 후 패스워드를 생성하셔야합니다.${NC}"

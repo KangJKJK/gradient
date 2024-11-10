@@ -77,13 +77,13 @@ case $choice in
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
 
+        # 프록시 타입 선택
+        read -p "프록시 타입을 선택하세요 (1: HTTP, 2: SOCKS5): " proxy_type
+
         # 프록시 정보 입력 안내
         echo -e "${YELLOW}프록시 정보를 입력하세요. 입력형식: http://user:pass@ip:port${NC}"
         echo -e "${YELLOW}여러 개의 프록시는 줄바꿈으로 구분하세요.${NC}"
         echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
-
-        # 프록시 타입 선택
-        read -p "프록시 타입을 선택하세요 (1: HTTP, 2: SOCKS5): " proxy_type
 
         # proxies.txt 파일 초기화
         > "$WORK/proxies.txt"

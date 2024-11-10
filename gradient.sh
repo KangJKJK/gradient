@@ -94,13 +94,11 @@ case $choice in
             
             case $proxy_type in
                 1)
-                    # HTTP를 SOCKS5로 변환
-                    socks5_line="${line/http:/socks5:}"
-                    echo "$socks5_line" >> "$WORK/proxies.txt"
+                    echo "$line" >> "$WORK/proxies.txt"
                     ;;
                 2)
-                    # SOCKS5는 그대로 저장
-                    echo "$line" >> "$WORK/proxies.txt"
+                    socks5_line="${line/http:/socks5:}"
+                    echo "$socks5_line" >> "$WORK/proxies.txt"
                     ;;
                 *)
                     echo -e "${RED}잘못된 선택입니다. 프로그램을 종료합니다.${NC}"
@@ -145,6 +143,7 @@ case $choice in
         cd "$WORK"
         sudo apt-get update
         sudo apt-get -y upgrade
+        
         # gradient 컨테이너 제거
         echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
         docker ps | grep gradient  # gradient 관련 컨테이너 목록 출력

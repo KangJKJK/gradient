@@ -28,6 +28,7 @@ case $choice in
         sudo apt update
         sudo apt install git
         sudo apt-get install -y ufw
+        sudo apt-get install -y net-tools  
 
         echo -e "${YELLOW}작업 공간 준비 중...${NC}"
         if [ -d "$WORK" ]; then

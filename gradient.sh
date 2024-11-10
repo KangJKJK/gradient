@@ -158,16 +158,25 @@ case $choice in
         ;;
 
     3)
-        echo -e "${YELLOW}gradient 노드를 제거합니다.${NC}"
-        cd "$WORK"
-
-        # gradient 컨테이너 제거
-        echo -e "${YELLOW}현재 실행 중인 gradient 관련 컨테이너 목록:${NC}"
-        docker ps | grep gradient  # gradient 관련 컨테이너 목록 출력
-        read -p "제거할 gradient 컨테이너 ID를 입력하세요: " container_id2
-        docker rm -f "$container_id2"  # 컨테이너 강제 제거
-        echo -e "${GREEN}컨테이너 $container_id2 가 제거되었습니다.${NC}"
+        echo -e "${YELLOW}gradient 노드를 중지하고 완전히 제거합니다.${NC}"
+        
+        # 실행 중인 모든 gradient 컨테이너 찾아서 중지 및 제거
+        echo -e "${YELLOW}실행 중인 모든 gradient 컨테이너를 중지하고 제거합니다...${NC}"
+        docker ps -a | grep gradient | awk '{print $1}' | xargs -r docker stop
+        docker ps -a | grep gradient | awk '{print $1}' | xargs -r docker rm
+        
+        # gradient 관련 Docker 이미지 제거
+        echo -e "${YELLOW}gradient 관련 Docker 이미지를 제거합니다...${NC}"
+        docker images | grep gradient | awk '{print $3}' | xargs -r docker rmi -f
         echo
+        
+        # 작업 디렉토리 제거
+        if [ -d "$WORK" ]; then
+            echo -e "${YELLOW}작업 디렉토리를 제거합니다...${NC}"
+            rm -rf "$WORK"
+        fi
+        
+        echo -e "${GREEN}gradient 노드가 완전히 제거되었습니다.${NC}"
         ;;
 
     *)

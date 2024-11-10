@@ -81,7 +81,9 @@ case $choice in
         read -p "프록시 타입을 선택하세요 (1: HTTP, 2: SOCKS5): " proxy_type
 
         # 프록시 정보 입력 안내
-        echo -e "${YELLOW}프록시 정보를 입력하세요. 입력형식: http://user:pass@ip:port${NC}"
+        echo -e "${YELLOW}프록시 정보를 입력하세요.${NC}"
+        echo -e "${YELLOW}입력형식: socks5://user:pass@ip:port${NC}"
+        echo -e "${YELLOW}HTTP 프록시를 사용하시는 경우, http:// 대신 socks5:// 로 변경해서 입력해주세요.${NC}"
         echo -e "${YELLOW}여러 개의 프록시는 줄바꿈으로 구분하세요.${NC}"
         echo -e "${YELLOW}입력을 마치려면 엔터를 두 번 누르세요.${NC}"
 
@@ -91,20 +93,13 @@ case $choice in
         # 프록시 정보 입력 받기
         while IFS= read -r line; do
             [[ -z "$line" ]] && break
-            
-            case $proxy_type in
-                1)
-                    echo "$line" >> "$WORK/proxies.txt"
-                    ;;
-                2)
-                    socks5_line="${line/http:/socks5:}"
-                    echo "$socks5_line" >> "$WORK/proxies.txt"
-                    ;;
-                *)
-                    echo -e "${RED}잘못된 선택입니다. 프로그램을 종료합니다.${NC}"
-                    exit 1
-                    ;;
-            esac
+            # SOCKS5 형식 검증
+            if [[ ! $line == socks5://* ]]; then
+                echo -e "${RED}잘못된 프록시 형식입니다. socks5://로 시작해야 합니다.${NC}"
+                echo -e "${RED}입력된 프록시: $line${NC}"
+                exit 1
+            fi
+            echo "$line" >> "$WORK/proxies.txt"
         done
 
         echo -e "${GREEN}프록시 정보가 proxies.txt 파일에 저장되었습니다.${NC}"
